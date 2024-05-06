@@ -12,8 +12,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
     
 class UserLoginSerializer(serializers.ModelSerializer):
+    
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    
     class Meta:
         model = CustomUser
         fields = ['username', 'password']
