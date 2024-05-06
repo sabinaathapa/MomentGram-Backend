@@ -4,7 +4,7 @@ from rest_framework import serializers
 class PostsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Posts
-        fields = '__all__'
+        fields = ['id', 'user', 'content', 'caption', 'created_at', 'expiration_date']
         
 class LikesSerializer(serializers.ModelSerializer):
     class Meta:
