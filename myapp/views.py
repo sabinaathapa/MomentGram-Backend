@@ -4,6 +4,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import *
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -66,7 +67,6 @@ class CommentViewAPI(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
     def create(self, request, *args, **kwargs):
-        print(request.data)
         user = self.request.user
         
         #Getting post to comment
@@ -80,6 +80,35 @@ class CommentViewAPI(generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+#Followers View
+class FollowersViewAPI(generics.CreateAPIView):
+    queryset = Followers.objects.all()
+    serializer_class = FollowersSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        user_to_follow = get_object_or_404(CustomUser, username=self.kwargs.get('username'))
+        existing_follow = Followers.objects.filter(follower_id=user, following_id=user_to_follow).first()
+        if existing_follow:
+            existing_follow.delete()  # Unfollow
+            user_to_follow.followers_count -= 1
+            user.following_count -= 1
+            user_to_follow.save()
+            user.save()
+            return Response({'message': 'User Unfollowed'}, status=status.HTTP_200_OK)
+        else:
+            serializer.save(follower_id=user, following_id=user_to_follow)
+            user_to_follow.followers_count += 1
+            user.following_count += 1
+            user_to_follow.save()
+            user.save()
+            return Response({'message': 'User Followed'}, status=status.HTTP_201_CREATED)
+     
+
+        
+    
     
         
         
