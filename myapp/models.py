@@ -7,6 +7,7 @@ class Posts(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField()
     caption = models.CharField(max_length=200)
+    likes_count = models.IntegerField(default=0 )
     created_at = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
     
