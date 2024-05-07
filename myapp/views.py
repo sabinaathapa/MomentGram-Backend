@@ -59,6 +59,31 @@ class LikesViewAPI(generics.ListCreateAPIView):
             post.save()
             return Response({'message':'Post Liked'}, status=status.HTTP_201_CREATED)
         
+#Comment View
+class CommentViewAPI(generics.ListCreateAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentsSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        user = self.request.user
+        
+        #Getting post to comment
+        post_id = self.kwargs.get('post_id')
+        try:
+            post = Posts.objects.get(id=post_id)
+        except Posts.DoesNotExist:
+            return Response({'error': 'Post does not exist'}, status=status.HTTP_404_NOT)
+        
+        serializer = self.get_serializer(data= request.data, context = {'user': user, 'post':post})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+        
+        
+        
             
             
         

@@ -14,7 +14,7 @@ class LikesSerializer(serializers.ModelSerializer):
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
-        fields = '__all__'
+        fields = ['id', 'user', 'post', 'content', 'created_at']
 
 class FollowersSerializer(serializers.ModelSerializer):
     class Meta:
