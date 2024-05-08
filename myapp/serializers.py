@@ -19,7 +19,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 class FollowersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Followers
-        fields = ['id', 'follower_id', 'following_id', 'created_at']
+        fields = ['id', 'follower_id', 'following_id']
         
 class DirectMessageSerializer(serializers.ModelSerializer):
     class Meta:

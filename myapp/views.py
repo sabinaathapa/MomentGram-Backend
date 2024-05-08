@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from .serializers import *
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import *
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 
 # Create your views here.
@@ -105,6 +106,35 @@ class FollowersViewAPI(generics.CreateAPIView):
             user_to_follow.save()
             user.save()
             return Response({'message': 'User Followed'}, status=status.HTTP_201_CREATED)
+#TODO: The Followers view has be correted.
+
+#Direct Message View
+class SendMessageViewAPI(generics.CreateAPIView):
+    queryset = DirectMessage.objects.all()
+    serializer_class = DirectMessageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+class RetrieveMessageViewAPI(generics.ListAPIView):
+    queryset = DirectMessage.objects.all()
+    serializer_class = DirectMessageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at']
+    
+    def get_queryset(self):
+        other_user = get_object_or_404(CustomUser, username=self.kwargs.get('username'))
+        return DirectMessage.objects.filter(
+            Q(sender=self.request.user, receiver=other_user)|
+            Q(sender=other_user, receiver=self.request.user)
+        ).distinct()
+         
+        
+                
+
      
 
         
